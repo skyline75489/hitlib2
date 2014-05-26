@@ -5,7 +5,7 @@
 hitlib2
 -------
 
-	Class wrapper version of HITLIB2, 
+    Class wrapper version of HITLIB2, 
     Query the info of keyword
 
 Usage:
