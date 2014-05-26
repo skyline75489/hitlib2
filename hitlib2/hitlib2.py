@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*- 
+import argparse
 import re
+import sys
+
 import requests
 from BeautifulSoup import BeautifulSoup
 
@@ -91,7 +94,7 @@ class Query(object):
             response = requests.get(BASE_URL + "&title=" + self.keyword + "&pabookType=" + 
                        self.typeMap[self.q_type] + "&smcx_p=" + str(self.page))
         except requests.exceptions.RequestException as e:
-            print e.message
+            print(e.message)
             
         self.raw = response.content
         return BeautifulSoup(self.raw)
@@ -115,10 +118,34 @@ class Query(object):
         info.append(int(id_reg.findall(id_text)[0]))
         return info
 
-if __name__ == '__main__':
-    f = Query("python")
+def get_parser():
+    parser = argparse.ArgumentParser(description='Tiny Python library servering as a set of APIs for HIT Online Library')
+    parser.add_argument('query', metavar='QUERY', type=str, nargs='*',
+                        help='query the book info')    
+    parser.add_argument('-t', '--type', help='book type of query: sm (shumu), qk (qikan), lw (lunwen)', default='sm', type=str)    
+    parser.add_argument('-a','--all', help='display the full info of the result')
+    parser.add_argument('-p','--pos', help='select book info in specified position (default: 1)')
+
+    return parser
+
+def command_line_runner():
+    parser = get_parser()
+    args = vars(parser.parse_args())
+
+    if not args["query"]:
+        parser.print_help()
+        return
+
+    query(args)
+    return
+
+def query(args):
+    f = Query(' '.join(args['query']), args['type'])
+    if args['pos']:
+        print(f.origin(int(args['pos'])))
+        return
+
     f.show()
-    f.show("title")
-    f.origin()
-    
-    
+
+if __name__ == '__main__':
+    command_line_runner()
