@@ -8,6 +8,7 @@ import requests
 from BeautifulSoup import BeautifulSoup
 
 BASE_URL = "http://202.118.250.131/lib/opacAction.do?method=DoAjax&dispatch=smcx&type=smcx&method1=1&retrieveLib=1"
+BOOK_DETAIL_URL = "http://202.118.250.131/lib/opacAction.do?method=DoAjax&dispatch=searchBiblInfo&type=searchBiblInfo&book_type=589&currpage=1&id_bibl="
 
 #书目
 SM_TYPE="589"
@@ -18,15 +19,8 @@ LW_TYPE="666"
 
 
 def _make_sm_dict(info):
-    info_dict = {}
-    info_dict['title'] = info[0]
-    info_dict['author'] = info[1]
-    info_dict['publisher'] = info[2]
-    info_dict['year'] = info[3]
-    info_dict['pages'] = info[4]
-    info_dict['sn'] = info[5]
-    info_dict['id'] = info[7]
-    return info_dict
+    return Book({'title':info[0], 'author':info[1], 'publisher':info[2],
+    			 'year':info[3], 'pages':info[4], 'sn':info[5], 'id':info[7]})
 
 def _make_qk_dict(info):
     info_dict = {}
@@ -45,6 +39,20 @@ def _make_lw_dict(info):
     info_dict['sn'] = info[5]
     info_dict['id'] = info[7]
     return info_dict
+
+class Book(dict):
+	def prettyprint(self):
+		print(unicode('Title: {0[title]}\n'
+		       'Author: {0[author]}\n'
+		       'Publisher: {0[publisher]}\n'
+		       'Pub_Year: {0[year]}\n'
+		       'Pages: {0[pages]}\n'
+		       'Shelf No.: {0[sn]}\n'
+		       'ID: {0[id]}').format(self))
+		     
+	def store(self, filter=None):
+		pass
+		
 
 
 class Query(object):
