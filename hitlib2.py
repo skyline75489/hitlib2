@@ -45,54 +45,19 @@ def _make_lw_dict(info):
 
 
 class Query(object):
-	""" Class wrapper version of HITLIB2, 
-	    Query the info of keyword
-
-	> usage:
-	```
-	>>> from hitlib2 import Query
-	>>> f = Query("Python", "sm") #sm : shumu
-	>>> f.show()
-	>>> f.show("title")
-	>>> f.origin()
-
-	```
-	2014.5.25 18:08 jasonlvhit
-	
-	========
-	ToDO
-	========
-
-	or, 
-	you can just type in the console or bash window as below:
-
-	```
-	~$ python hitlib2.py Python
-	~$ chmod +x hitlib2.py
-	~$ ./hitlib2.py Python
-	~$ ./hitlib2 Python -c QK  #QK means QIKAN
-
-
-	======
-	ToDO
-	======
-
-	build a package, publish to the PyPI
-
-	"""
-	
 
 	def __init__(self, keyword, q_type="sm", page=1):
 		self.keyword = keyword
+		self.page = page
+		#cache the result
+		self.result = None
+		self.raw = None
 		self.q_type = q_type.lower()
 		
 		if q_type not in ("sm", "qk", "lw"):
 			raise TypeError("Wrong type")
 
-		self.page = page
-		#cache the result
-		self.result = None
-		self.raw = None
+
 		
 		self.typeFunctionMap = {
 			"sm": _make_sm_dict,
