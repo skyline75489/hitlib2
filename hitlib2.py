@@ -13,29 +13,6 @@ QK_TYPE="590"
 #论文
 LW_TYPE="666"
 
-def _request(title,query_type,page):
-	response = None
-	try:
-		response = requests.get(BASE_URL + "&title=" + title + "&pabookType=" + query_type + "&smcx_p=" + str(page));
-	except requests.exceptions.RequestException as e:
-		print e.message
-	if response :
-		return BeautifulSoup(response.content)
-	else:
-		raise TypeError("No response from server")
-
-def _digest_info(tr):
-	info = []
-	id_reg = re.compile(r'showDetail\(\'(\d*)\'\,')
-	id_text = tr.find(onclick=True)['onclick']
-	for td in tr.findAll("td"):
-		text = td.text.replace("/","")
-		text = text.replace("=","")
-		text = text.replace("\x1e"," ")
-		info.append(text)
-		
-	info.append(int(id_reg.findall(id_text)[0]))
-	return info
 
 def _make_sm_dict(info):
 	info_dict = {}
@@ -66,47 +43,6 @@ def _make_lw_dict(info):
 	info_dict['id'] = info[7]
 	return info_dict
 
-def _resolve_html(html,query_type):
-	trs = html.findAll(onmouseover=True)
-	result_list = []
-	for tr in trs:
-		info = _digest_info(tr)
-		row_dict = {}
-		if query_type == SM_TYPE:
-			row_dict = _make_sm_dict(info)
-		if query_type == QK_TYPE:
-			row_dict = _make_qk_dict(info)
-		if query_type == LW_TYPE:
-			row_dict = _make_lw_dict(info)
-
-		result_list.append(row_dict)
-	return result_list
-
-def query(title, q_type="sm", page=1):
-	"""
-	query() can query book, magzine and paper
-	"""
-	query_type = SM_TYPE
-	if q_type == "qk":
-		query_type == QK_TYPE
-	elif q_type == "lw":
-		query_type == LW_TYPE
-	
-	html = _request(title,query_type,page)
-	result = _resolve_html(html,query_type)
-	return result
-
-def prettyprint(result_list,keyword="title"):
-	"""
-	prettyprint can print the value of given key
-	of every result in the result_list
-	"""
-	for a in result_list:
-		if isinstance(a,dict):
-			print(a[keyword])
-		else:
-			raise TypeError("Non-dict type found in list")
-
 
 class Query(object):
 	""" Class wrapper version of HITLIB2, 
@@ -132,9 +68,9 @@ class Query(object):
 
 	```
 	~$ python hitlib2.py Python
-	~$ chmod 777 hitlib2.py
-	~$ hitlib2 Python
-	~$ hitlib2 Python -c QK  #QK means QIKAN
+	~$ chmod +x hitlib2.py
+	~$ ./hitlib2.py Python
+	~$ ./hitlib2 Python -c QK  #QK means QIKAN
 
 
 	======
@@ -156,7 +92,8 @@ class Query(object):
 		self.page = page
 		#cache the result
 		self.result = None
-
+		self.raw = None
+		
 		self.typeFunctionMap = {
 			"sm": _make_sm_dict,
 			"qk": _make_qk_dict,
@@ -174,15 +111,15 @@ class Query(object):
 			if isinstance(i, dict):
 				print(i[keyword])
 
-	def origin(self):
-		for i in self._get_result():
-			print(i)
+	def origin(self, num=0):
+		return self._get_result()[num]
 
 	def _get_result(self):
+		# already cached
 		if self.result:
 			return self.result
 
-		result = self._resolve_html(self._requests())
+		result = self._parse_html(self._requests())
 		self.result = result
 		return result
 		
@@ -192,25 +129,26 @@ class Query(object):
 				       self.typeMap[self.q_type] + "&smcx_p=" + str(self.page))
 		except requests.exceptions.RequestException as e:
 			print e.message
+			
+		self.raw = response.content
+		return BeautifulSoup(self.raw)
 
-		return BeautifulSoup(response.content)
-
-	def _resolve_html(self, f):
+	def _parse_html(self, f):
 		return [self.typeFunctionMap[self.q_type](self._digest_info(tr)) for tr in 
 			    f.findAll(onmouseover=True)]
 
 	def _digest_info(self, tr):
-		"""No Change
-		"""
 		info = []
 		id_reg = re.compile(r'showDetail\(\'(\d*)\'\,')
 		id_text = tr.find(onclick=True)['onclick']
 		for td in tr.findAll("td"):
-			text = td.text.replace("/","")
-			text = text.replace("=","")
-			text = text.replace("\x1e"," ")
+			# remove strange characters
+			text = td.text.replace("/", "")
+			text = text.replace("=", "")
+			text = text.replace("\x1e", " ")
 			info.append(text)
-
+			
+		# the id for more detail
 		info.append(int(id_reg.findall(id_text)[0]))
 		return info
 
