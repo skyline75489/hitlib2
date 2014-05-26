@@ -3,13 +3,13 @@
 
 """ 
 hitlib2
-
 -------
+
 	Class wrapper version of HITLIB2, 
     Query the info of keyword
 
-> usage:
-```
+Usage:
+```python
 >>> from hitlib2 import Query
 >>> f = Query("Python", "sm") #sm : shumu
 >>> f.show()
@@ -26,12 +26,12 @@ ToDO
 or, 
 you can just type in the console or bash window as below:
 
-```
+```bash
 ~$ python hitlib2.py Python
 ~$ chmod +x hitlib2.py
 ~$ ./hitlib2.py Python
 ~$ ./hitlib2 Python -c QK  #QK means QIKAN
-
+```
 
 ======
 ToDO

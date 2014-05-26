@@ -57,8 +57,6 @@ class Query(object):
 		if q_type not in ("sm", "qk", "lw"):
 			raise TypeError("Wrong type")
 
-
-		
 		self.typeFunctionMap = {
 			"sm": _make_sm_dict,
 			"qk": _make_qk_dict,
@@ -120,6 +118,7 @@ class Query(object):
 if __name__ == '__main__':
 	f = Query("python")
 	f.show()
-	f.origin()
 	f.show("title")
+	f.origin()
+	
 	
