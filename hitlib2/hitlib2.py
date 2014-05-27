@@ -19,8 +19,8 @@ LW_TYPE="666"
 
 
 def _make_sm_dict(info):
-    return Book({'title':info[0], 'author':info[1], 'publisher':info[2],
-    			 'year':info[3], 'pages':info[4], 'sn':info[5], 'id':info[7]})
+    return Book({'title':info[0], 'author':info[1], 'publisher':info[2], 
+                 'year':info[3], 'pages':info[4], 'sn':info[5], 'id':info[7]})
 
 def _make_qk_dict(info):
     info_dict = {}
@@ -41,19 +41,54 @@ def _make_lw_dict(info):
     return info_dict
 
 class Book(dict):
-	def prettyprint(self):
-		print(unicode('Title: {0[title]}\n'
-		       'Author: {0[author]}\n'
-		       'Publisher: {0[publisher]}\n'
-		       'Pub_Year: {0[year]}\n'
-		       'Pages: {0[pages]}\n'
-		       'Shelf No.: {0[sn]}\n'
-		       'ID: {0[id]}').format(self))
-		     
-	def store(self, filter=None):
-		pass
-		
 
+    def _request_for_detail(self):
+    	try:
+    		response = requests.get(BOOK_DETAIL_URL + str(self['id']))
+    	except requests.exceptions.RequestException as e:
+            print(e.message)
+            
+        self._detail_raw = response.content
+        return BeautifulSoup(self._detail_raw)
+
+    def _parse_detail(self, f):
+        self['shelf'] = []
+        a = f.findAll('td')
+        list_len = len(a)
+        for i in range(47, list_len-4, 4):
+            shelf_info = {}
+            shelf_info['num'] = a[i].text
+            shelf_info['pos'] = a[i+1].text
+            shelf_info['type'] = a[i+2].text
+            shelf_info['status'] = a[i+3].text
+            shelf_info['return'] = a[i+4].text
+            if not shelf_info['num'] or not shelf_info['pos']:
+                continue
+            for k in shelf_info.keys():
+                if shelf_info[k].find('nbsp') > 0:
+                    return
+            self['shelf'].append(shelf_info)
+
+    def _get_result(self):
+        if self.has_key('shelf'):
+            return self['shelf']
+
+        self._parse_detail(self._request_for_detail())
+        return self['shelf']
+
+    def show_book(self):
+    	print(unicode('{0[title]}\n'
+    		          '{0[author]}\n'
+    		          '{0[publisher]}\n'
+    		          '{0[year]}\n'
+    		          '{0[pages]}\n'
+    		          '{0[sn]}\n'
+    		          '{0[id]}').format(self))
+
+    def show_shelf(self):
+        for i in self._get_result():
+            print(unicode('{0[num]}\t\t{0[pos]}\t\t{0[type]}\t\t{0[status]}\t{0[return]}').format(i))
+            
 
 class Query(object):
 
@@ -93,9 +128,8 @@ class Query(object):
         if self.result:
             return self.result
 
-        result = self._parse_html(self._requests())
-        self.result = result
-        return result
+        self.result = self._parse_html(self._requests())
+        return self.result
         
     def _requests(self):
         try:
