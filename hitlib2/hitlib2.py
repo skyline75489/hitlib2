@@ -44,7 +44,7 @@ class Book(dict):
 
     def _request_for_detail(self):
     	try:
-    		response = requests.get(BOOK_DETAIL_URL + str(self['id']))
+    	    response = requests.get(BOOK_DETAIL_URL + str(self['id']))
     	except requests.exceptions.RequestException as e:
             print(e.message)
             
@@ -55,6 +55,7 @@ class Book(dict):
         self['shelf'] = []
         a = f.findAll('td')
         list_len = len(a)
+	# digest the response page we got
         for i in range(47, list_len-4, 4):
             shelf_info = {}
             shelf_info['num'] = a[i].text
@@ -65,6 +66,7 @@ class Book(dict):
             if not shelf_info['num'] or not shelf_info['pos']:
                 continue
             for k in shelf_info.keys():
+		# unwanted info, break out 
                 if shelf_info[k].find('nbsp') > 0:
                     return
             self['shelf'].append(shelf_info)
@@ -78,12 +80,12 @@ class Book(dict):
 
     def show_book(self):
     	print(unicode('{0[title]}\n'
-    		          '{0[author]}\n'
-    		          '{0[publisher]}\n'
-    		          '{0[year]}\n'
-    		          '{0[pages]}\n'
-    		          '{0[sn]}\n'
-    		          '{0[id]}').format(self))
+    		      '{0[author]}\n'
+    		      '{0[publisher]}\n'
+    		      '{0[year]}\n'
+    		      '{0[pages]}\n'
+    		      '{0[sn]}\n'
+    		      '{0[id]}').format(self))
 
     def show_shelf(self):
         for i in self._get_result():
