@@ -5,16 +5,35 @@ Tiny Python library servering as a set of APIs for HIT Online Library
 
 ##Usage:
 
+####Simple Query
 ```python
 >>> from hitlib2 import Query
->>> f = Query("Python", "sm") #sm : shumu
->>> f.show()
->>> f.show("title")
->>> f.origin()
+>>> f = Query("Python", "sm") # sm : shumu
+>>> f.show() # same as f.show('title')
+Exploring python 
+真实世界的Python仪器监控
+Python入门经典
+Head First Python
+......
+```
+####Book and shelf detail
+```python
+>>> f.origin().show_book() # same as f.origin.show_book()(0)
+Exploring python 
+Budd Timothy A. Timothy A. Budd.
+Mc Graw Hill Higher Education,
+c2010.
+278 p. :
+TP312PYB927
+210000000724250
+>>> f.origin().show_shelf()
+1000172846		一区外文样本(501-1)		外文书		在馆	
+>>> 
+
 
 ```
 
-* or you can just type in the console or bash window as below:
+Or you can just type in the console or bash window as below:
 
 ```bash
 $ python hitlib2.py
@@ -45,7 +64,7 @@ Head first Python
 Programming Python 
 Python Web开发学习实录
 
-$ hitlib2 热处理 -t lw
+$ python hitlib2.py 热处理 -t lw
 纯钛和BT20钛合金筒形件旋压织构及在热处理中的演化
 3J33(AB)马氏体时效钢强韧化热处理工艺及力学性能
 20CrMoH齿轮用钢热处理工艺研究
