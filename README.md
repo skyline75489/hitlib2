@@ -18,7 +18,7 @@ Head First Python
 ```
 ####Book and shelf detail
 ```python
->>> f.origin().show_book() # same as f.origin.show_book()(0)
+>>> f.origin().show_book() # same as f.origin(0).show_book()
 Exploring python 
 Budd Timothy A. Timothy A. Budd.
 Mc Graw Hill Higher Education,
@@ -28,9 +28,6 @@ TP312PYB927
 210000000724250
 >>> f.origin().show_shelf()
 1000172846		一区外文样本(501-1)		外文书		在馆	
->>> 
-
-
 ```
 
 Or you can just type in the console or bash window as below:
