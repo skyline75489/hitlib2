@@ -78,7 +78,7 @@ class Book(dict):
         self._parse_detail(self._request_for_detail())
         return self['shelf']
 
-    def show_book(self):
+    def show(self):
     	print(unicode('{0[title]}\n'
     		      '{0[author]}\n'
     		      '{0[publisher]}\n'
@@ -87,7 +87,7 @@ class Book(dict):
     		      '{0[sn]}\n'
     		      '{0[id]}').format(self))
 
-    def show_shelf(self):
+    def shelf(self):
         for i in self._get_result():
             print(unicode('{0[num]}\t\t{0[pos]}\t\t{0[type]}\t\t{0[status]}\t{0[return]}').format(i))
             
