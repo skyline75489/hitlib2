@@ -138,13 +138,15 @@ class Query(object):
         return self.result
 
     def _requests(self):
+        resp = None
         try:
-            response = requests.get(BASE_URL + "&title=" + self.keyword + "&pabookType=" +
+            resp = requests.get(BASE_URL + "&title=" + self.keyword + "&pabookType=" +
                                     self.typeMap[self.q_type] + "&smcx_p=" + str(self.page))
         except requests.exceptions.RequestException as e:
             print(e.message)
-
-        self.raw = response.content
+        if not resp:
+            raise Exception("Service currently not available.")
+        self.raw = resp.content
         return BeautifulSoup(self.raw)
 
     def _parse_html(self, f):
